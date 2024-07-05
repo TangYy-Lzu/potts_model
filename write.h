@@ -9,7 +9,7 @@ using namespace std; // 默认用库是std，这样可能造成冲突，比如�
 #define dimentions SIZE + 1
 
 void write(ofstream &output, double tstar, int spins[SIZE + 1]);
-void bin(ofstream &outputBining, double T[TN], double bins[TN][6][B], int count);
+void bin(ofstream &outputBining, double T[TN], double bins[TN][NBIN][B], int count);
 void w_output(ofstream &file, double tstar, double m[TN][DATA], int count); // output传给file，file就等于write文件中的output了
 void w_distance(ofstream &outputdistance);
 void w_d_minus_one(ofstream &outputdistance, int i, int d, int sum);
@@ -31,7 +31,7 @@ void write(ofstream &output, double tstar, int spins[SIZE + 1])
     return;
 }
 
-void bin(ofstream &outputBining, double T[TN], double bins[TN][6][B], int count)
+void bin(ofstream &outputBining, double T[TN], double bins[TN][NBIN][B], int count)
 {
     int i, j, k;
     // ofstream output;          // 创建流对象为output，输入输出流的名字就叫output
@@ -40,7 +40,7 @@ void bin(ofstream &outputBining, double T[TN], double bins[TN][6][B], int count)
     for (i = 0; i < count; i++)
     {
         outputBining << T[i] << " " << endl;
-        for (j = 0; j < 6; j++)
+        for (j = 0; j < NBIN; j++)
         {
             for (k = 0; k < B; k++)
             {
@@ -68,7 +68,7 @@ void w_output(ofstream &file, double tstar, double m[TN][DATA], int count) // ou
 
     double chi = (m[count][MAG2] - m[count][MAG] * m[count][MAG]) * SIZE;                    // Magnetic susceptibility (up to T factor)，磁场强度涨落，磁化率
     double rhom = chi != 0 ? (m[count][MAGERR] - m[count][MAG] * m[count][MAG]) / chi : 0.0; // Rho magnetization, computed if chi != 0，磁化强度的自关联函数
-    double taugm = rhom != 1.0 ? rhom / (1.0 - rhom) : 0.0;                                  // Taug magnetization, computed if rhom != 0，Taug磁化
+    double taugm = rhom != 1.0 ? rhom / (1.0 - rhom) : 0.0;                                  // Taug magnetization, computed if rhom != 0，Taug磁化,如果条件 rhom != 1.0 成立（即 rhom 不等于 1.0），则执行这个表达式，计算 rhom / (1.0 - rhom) 的值
     file << m[count][MAG] << " " << sqrt(chi * abs(2.0 * taugm + 1) / (1.0 * N)) << " ";     // Write everything，把这些物理量全写出来，sqrt为开根号，abs为绝对值
 
     double fourth = m[count][MAG4] - m[count][MAG2] * m[count][MAG2];                                  // Susceptibility variance，磁化率涨落
@@ -91,8 +91,20 @@ void w_output(ofstream &file, double tstar, double m[TN][DATA], int count) // ou
     double binder = 1.0 - m[count][MAG4] / (3.0 * m[count][MAG2] * m[count][MAG2]); // Computes 4th cumulant minus one, b-1.计算binder 4th cumulant，用它来得到临界温度
     file << binder << " " << 2.0 * (1.0 - binder) * (error_sq / m[count][MAG2]);
 
-    double order = (m[count][DIS2] - m[count][DIS] * m[count][DIS]);
-    file << " " << m[count][DIS] * SIZE << " " << order << " " << endl;
+    double dis_order = (m[count][DIS2] - m[count][DIS] * m[count][DIS]) * SIZE;
+
+    if (J > 0)
+    {
+        file << " " << m[count][DIS] << " " << dis_order << " ";
+    }
+    else
+    {
+        file << " " << m[count][DIS] * m[count][DIS] * SIZE << " " << dis_order << " ";
+    }
+
+    double order_order = (m[count][ORDER2] - m[count][ORDER] * m[count][ORDER]) * SIZE;
+
+    file << m[count][ORDER] << " " << order_order << endl;
 
     return;
 }

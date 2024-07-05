@@ -194,4 +194,57 @@ void get_neighbors_union_jack(int neighs[SIZE][nei]) // 相邻的有四个，这
     return;
 }
 
+// void get_neighbors_union_jack(int neighs[SIZE][nei]) // 相邻的有四个，这是个二维数组size*4个元素
+// {
+//     int UP = 0;
+//     int DOWN = 1;
+//     int LEFT = 2;
+//     int RIGHT = 3;
+//     int UP_LEFT = 4;
+//     int UP_RIGHT = 5;
+//     int DOWN_RIGHT = 6;
+//     int DOWN_LEFT = 7;
+
+//     int i, j;
+//     int u, d, r, l;
+
+//     for (i = 0; i < 2 * L; i += 2) // i列
+//     {
+//         for (j = 0; j < 2 * L; j += 2) // j行
+//         {
+//             // Get the (x,y) with periodic boundaries得到有周期边界条件的（x,y）
+//             u = j + 1 == L ? 0 : j + 1;      // if j+1=L，u=0，else j=j+1
+//             d = j - 1 == -1 ? L - 1 : j - 1; // L=16，而格子等于15
+//             r = i + 1 == L ? 0 : i + 1;
+//             l = i - 1 == -1 ? L - 1 : i - 1;
+//             if (((i + j) % 2) == 0)
+//             {
+//                 //(x,y) to index notation and store in table，得到四个近邻格子的坐标
+//                 neighs[i + j * L][UP] = i + u * L;
+//                 neighs[i + j * L][DOWN] = i + d * L;
+//                 neighs[i + j * L][LEFT] = l + j * L;
+//                 neighs[i + j * L][RIGHT] = r + j * L;
+//                 neighs[i + j * L][UP_LEFT] = SIZE;
+//                 neighs[i + j * L][UP_RIGHT] = SIZE;
+//                 neighs[i + j * L][DOWN_RIGHT] = SIZE;
+//                 neighs[i + j * L][DOWN_LEFT] = SIZE;
+//             }
+//             else
+//             {
+//                 //(x,y) to index notation and store in table，得到八个近邻格子的坐标
+//                 neighs[i + j * L][UP] = i + u * L;
+//                 neighs[i + j * L][DOWN] = i + d * L;
+//                 neighs[i + j * L][LEFT] = l + j * L;
+//                 neighs[i + j * L][RIGHT] = r + j * L;
+//                 neighs[i + j * L][UP_LEFT] = l + u * L;
+//                 neighs[i + j * L][UP_RIGHT] = r + u * L;
+//                 neighs[i + j * L][DOWN_RIGHT] = r + d * L;
+//                 neighs[i + j * L][DOWN_LEFT] = l + d * L;
+//             }
+//         }
+//     }
+
+//     return;
+// }
+
 #endif

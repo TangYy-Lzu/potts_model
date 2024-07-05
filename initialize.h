@@ -3,7 +3,8 @@
 
 #include "constant.h"
 
-#define DATA 12
+#define DATA 17
+#define NBIN 7
 
 #define MAG 0
 #define MAG2 1
@@ -15,10 +16,16 @@
 #define ENE4 7
 #define ENERR 8
 #define CHERR 9
-#define DIS 10
-#define DIS2 11
+#define ORDER 10
+#define ORDER2 11
+#define ORDERRR 12
+#define DIS 13
+#define DIS2 14
+#define DISRR 15
+#define DIS2RR 16
 
-double m[TN][DATA], bins[TN][6][B], old[TN][6]; // This array contains several moments of the magnetization and energy，这个数组包含了一些磁矩和能量，bins和old拿来计算误差
+double m[TN][DATA], bins[TN][NBIN][B], old[TN][NBIN]; // This array contains several moments of the magnetization and energy，这个数组包含了一些磁矩和能量，bins和old拿来计算误差
+double private_m[TN][DATA], private_bins[TN][NBIN][B], private_old[TN][NBIN];
 int up[Q];
 
 // 全局变量space拿来记录空间各个位置的构型数目
@@ -26,7 +33,7 @@ vector<vector<int>> space;
 
 void initialize();
 void initialize_up(int up[Q]);
-void initialize_m(double m[TN][DATA]);
+void initialize_m(double m[TN][DATA], double private_m[TN][DATA]);
 void initialize_Array();
 
 // int main()
@@ -67,8 +74,12 @@ void initialize_Array();
 void initialize() // 存放状态全部向上变化一和统计出来的各个TN温度下的物理量
 {
     initialize_up(up);
-    initialize_m(m);
-    initialize_Array();
+    initialize_m(m, private_m);
+
+    if (WRITE)
+    {
+        initialize_Array();
+    }
 
     return;
 }
@@ -83,7 +94,7 @@ void initialize_up(int up[Q])
     return;
 }
 
-void initialize_m(double m[TN][DATA])
+void initialize_m(double m[TN][DATA], double private__m[TN][DATA])
 {
     int i, j;
     for (i = 0; i < TN; i++)
@@ -91,6 +102,13 @@ void initialize_m(double m[TN][DATA])
         for (j = 0; j < DATA; j++)
         {
             m[i][j] = 0.0; // Init the values，181，#define DATA 9，初始化值
+        }
+    }
+    for (i = 0; i < TN; i++)
+    {
+        for (j = 0; j < DATA; j++)
+        {
+            private_m[i][j] = 0.0; // Init the values，181，#define DATA 9，初始化值
         }
     }
     return;

@@ -19,8 +19,6 @@
 
 using namespace std; // 默认用库是std，这样可能造成冲突，比如用std里的函数当变量名
 
-double deltat = 0.1;
-double deltat_crit = 0.01; // 相变点附近精确计算
 double tmin = 0.0;
 double tmax = ((TN - 1 - (tcrit_up - tcrit_down) / deltat_crit) * deltat + tcrit_up - tcrit_down + tmin); // 最大温度为
                                                                                                           // 1 + (tcrit_up - tcrit_down) / deltat_crit + (tmax - tcrit_up + tcrit_down - tmin) / deltat = TN
@@ -51,25 +49,25 @@ void get_temperature(double T[TN]); // 这个数组存放要计算的各个温�
 //         cout << T[i] << " ";
 //     }
 //     cout << endl;
-// cout << endl;
-// cout << "度规是：" << endl;
-// for (int i = 0; i < q; i++)
-// {
-//     for (int j = 0; j < q; j++)
+//     cout << endl;
+//     cout << "度规是：" << endl;
+//     for (int i = 0; i < q; i++)
 //     {
-//         cout << eta[i][j] << " ";
+//         for (int j = 0; j < q; j++)
+//         {
+//             cout << eta[i][j] << " ";
+//         }
+//         cout << endl;
 //     }
 //     cout << endl;
-// }
-// cout << endl;
-// cout << "中心位置距离是：";
-// for (int i = 0; i < q; i++)
-// {
-//     cout << center[i] << " ";
-// }
-// cout << endl;
-// cout << endl;
-// cout << "构型空间最大距离是：" << r_max << endl;
+//     cout << "中心位置距离是：";
+//     for (int i = 0; i < q; i++)
+//     {
+//         cout << center[i] << " ";
+//     }
+//     cout << endl;
+//     cout << endl;
+//     cout << "构型空间最大距离是：" << r_max << endl;
 //     return 0;
 // }
 
@@ -92,16 +90,7 @@ void c_eta(double eta[q][q])
 
     if (Q == 2)
     {
-        for (i = 0; i < q; i++)
-        {
-            for (j = 0; j < q; j++)
-            {
-                for (k = 0; k < q; k++)
-                {
-                    eta[i][j] += c_eta[i][k] * c_eta[j][k];
-                }
-            }
-        }
+        eta[0][0] = 1;
         return;
     }
 
@@ -121,6 +110,34 @@ void c_eta(double eta[q][q])
         }
         return;
     }
+
+    // 第i行。就是第i个坐标轴在直角坐标系下的坐标，前i-2个元素的平方和，用来归一化和计算后一个的值
+    double normalize;
+    normalize = c_eta[1][0] * c_eta[1][0];
+
+    for (i = 2; i < Q - 1; i++)
+    {
+        for (j = 0; j < i - 1; j++)
+        {
+            c_eta[i][j] = c_eta[i - 1][j];
+        }
+        c_eta[i][i - 1] = (0.5 - normalize) / c_eta[i - 1][i - 1];
+        normalize += c_eta[i][i - 1] * c_eta[i][i - 1];
+        c_eta[i][i] = sqrt(1 - normalize);
+    }
+
+    for (i = 0; i < q; i++)
+    {
+        for (j = 0; j < q; j++)
+        {
+            for (k = 0; k < q; k++)
+            {
+                eta[i][j] += c_eta[i][k] * c_eta[j][k];
+            }
+        }
+    }
+
+    return;
 }
 
 void c_center(double center[Q])
