@@ -23,6 +23,11 @@ namespace mc_step
 
         for (i = 0; i < Parameters::SAMPLE_SIZE; i++)
         {
+            for (int j = 0; j < DATA; j++)
+            {
+                private_bins[j] = 0;
+            }
+
             for (j = 0; j < Parameters::GROUP_SIZE; j++)
             {
                 for (k = 0; k < SIZE; k++)
@@ -190,6 +195,11 @@ namespace mc_step
 
         for (i = 0; i < Parameters::SAMPLE_SIZE; i++)
         {
+            for (int j = 0; j < DATA; j++)
+            {
+                private_bins[j] = 0;
+            }
+
             for (j = 0; j < Parameters::GROUP_SIZE; j++)
             {
                 area(spins, energy, gen, tstar, brandom, ran_pos, ran_u, pa);

@@ -57,10 +57,10 @@ int main(void)
 #pragma omp for
         for (int i = 0; i < Parameters::BRONKEN_SIZE; ++i)
         {
-            thread_local std::mt19937 gen(958431198 + omp_get_thread_num()); // 线程独立的随机数生成器
-            std::uniform_int_distribution<int> brandom(0, q);                // Get any random integer，获取任意0到q之间随机整数值，也让他决定自旋往哪个态调整
-            std::uniform_int_distribution<int> ran_pos(0, SIZE - 1);         // Get any random integer，获取任意0到SIZE-1随机整数值
-            std::uniform_real_distribution<double> ran_u(0.0, 1.0);          // Our uniform variable generator，产生均匀分布
+            thread_local std::mt19937 gen(958431198 + i);            // 线程独立的随机数生成器
+            std::uniform_int_distribution<int> brandom(0, q);        // Get any random integer，获取任意0到q之间随机整数值，也让他决定自旋往哪个态调整
+            std::uniform_int_distribution<int> ran_pos(0, SIZE - 1); // Get any random integer，获取任意0到SIZE-1随机整数值
+            std::uniform_real_distribution<double> ran_u(0.0, 1.0);  // Our uniform variable generator，产生均匀分布
 
             double energy;
             Initialization::initialize_spins(spins, gen, brandom); // Init randomly，初始化
