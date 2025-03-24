@@ -12,10 +12,6 @@
 #include "write.hpp"
 #include "write.cpp"
 
-int spins[SIZE + 1]; // 储存自旋信息
-
-double private_m[DATA], private_bins[NBIN]; // 暂时储存物理量
-
 int main(void)
 {
     auto start = std::chrono::high_resolution_clock::now(); // 获取开始时间
@@ -42,22 +38,32 @@ int main(void)
     BiningStream << "../bining/bining_" << Parameters::LATTICE_TYPE << "_" << mag << "_Q" << Parameters::Q << "_L" << Parameters::LATTICE_SIZE << ".txt";
     std::string Bining = BiningStream.str();
 
-    std::ofstream output, outputspins, outputBining, outputdistance; // Output of the stream，创建流对象为output，再看87行
+    std::stringstream correlationStream;
+    correlationStream << "../correlation/correlation_" << Parameters::LATTICE_TYPE << "_" << mag << "_Q" << Parameters::Q << "_L" << Parameters::LATTICE_SIZE << ".txt";
+    std::string correlation = correlationStream.str();
+
+    std::ofstream output, outputspins, outputBining, outputdistance, outputcorrelation; // Output of the stream，创建流对象为output，再看87行
 
     output.open(quantity);
     outputspins.open(image);
     outputBining.open(Bining);
+    outputcorrelation.open(correlation);
 
     Constants::constant();
     Initialization::initialize();
     neighbors::get_neighbors(); // Get neighbour table，取近邻
 
-#pragma omp parallel num_threads(8) firstprivate(spins, private_m, private_bins)
+#pragma omp parallel num_threads(8)
     {
+        thread_local std::mt19937 gen(958431198 + omp_get_thread_num()); // 线程独立的随机数生成器
+
+        int spins[SIZE + 1]; // 储存自旋信息
+
+        double private_m[DATA], private_bins[NBIN], private_corr[DATA]; // 暂时储存物理量
+
 #pragma omp for
-        for (int i = 0; i < Parameters::BRONKEN_SIZE; ++i)
+        for (int i = 0; i < Parameters::BROKEN_SIZE; ++i)
         {
-            thread_local std::mt19937 gen(958431198 + i);            // 线程独立的随机数生成器
             std::uniform_int_distribution<int> brandom(0, q);        // Get any random integer，获取任意0到q之间随机整数值，也让他决定自旋往哪个态调整
             std::uniform_int_distribution<int> ran_pos(0, SIZE - 1); // Get any random integer，获取任意0到SIZE-1随机整数值
             std::uniform_real_distribution<double> ran_u(0.0, 1.0);  // Our uniform variable generator，产生均匀分布
@@ -73,17 +79,18 @@ int main(void)
             // 由于double类型的精度问题导致i储存进去要比本来的值多一点，比如tstar应该是4.9，在计算机储存时变为了4.900000004或者更小一点，导致这里用大于号得到的结果一样
             // double类型比较大小时要时刻注意
             {
-                mc_step::do_step(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins);
-                if (i == (Parameters::BRONKEN_SIZE - 1))
-                {
-                    FileUtils::write(outputspins, tstar, spins);
-                }
+                mc_step::do_step(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins, private_corr);
 #pragma omp critical
                 {
+                    if (i == (Parameters::BROKEN_SIZE - 1))
+                    {
+                        FileUtils::write(outputspins, tstar, spins);
+                    }
                     for (int j = 0; j < DATA; ++j)
                     {
                         Initialization::m[count][j] += private_m[j];
                         Initialization::bins[count][j] += private_bins[j];
+                        Initialization::corr[count][j] += private_corr[j];
                     }
                     for (int j = DATA; j < NBIN; ++j)
                     {
@@ -100,22 +107,23 @@ int main(void)
             {
                 if (Parameters::J < 0)
                 {
-                    mc_step::do_step(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins);
+                    mc_step::do_step_wolff(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins, private_corr);
                 }
                 else if (Parameters::J > 0)
                 {
-                    mc_step::do_step(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins);
-                }
-                if (i == (Parameters::BRONKEN_SIZE - 1))
-                {
-                    FileUtils::write(outputspins, tstar, spins);
+                    mc_step::do_step(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins, private_corr);
                 }
 #pragma omp critical
                 {
+                    if (i == (Parameters::BROKEN_SIZE - 1))
+                    {
+                        FileUtils::write(outputspins, tstar, spins);
+                    }
                     for (int j = 0; j < DATA; ++j)
                     {
                         Initialization::m[count][j] += private_m[j];
                         Initialization::bins[count][j] += private_bins[j];
+                        Initialization::corr[count][j] += private_corr[j];
                     }
                     for (int j = DATA; j < NBIN; ++j)
                     {
@@ -126,17 +134,18 @@ int main(void)
             }
             for (tstar = Parameters::T_CRIT_DOWN; tstar > Constants::tmincompare; tstar -= Parameters::DELTA_T)
             {
-                mc_step::do_step(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins);
-                if (i == (Parameters::BRONKEN_SIZE - 1))
-                {
-                    FileUtils::write(outputspins, tstar, spins);
-                }
+                mc_step::do_step(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins, private_corr);
 #pragma omp critical
                 {
+                    if (i == (Parameters::BROKEN_SIZE - 1))
+                    {
+                        FileUtils::write(outputspins, tstar, spins);
+                    }
                     for (int j = 0; j < DATA; ++j)
                     {
                         Initialization::m[count][j] += private_m[j];
                         Initialization::bins[count][j] += private_bins[j];
+                        Initialization::corr[count][j] += private_corr[j];
                     }
                     for (int j = DATA; j < NBIN; ++j)
                     {
@@ -146,17 +155,18 @@ int main(void)
                 count++;
             }
             tstar = 0.00001;
-            mc_step::do_step(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins);
-            if (i == (Parameters::BRONKEN_SIZE - 1))
-            {
-                FileUtils::write(outputspins, tstar, spins);
-            }
+            mc_step::do_step(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins, private_corr);
 #pragma omp critical
             {
+                if (i == (Parameters::BROKEN_SIZE - 1))
+                {
+                    FileUtils::write(outputspins, tstar, spins);
+                }
                 for (int j = 0; j < DATA; ++j)
                 {
                     Initialization::m[count][j] += private_m[j];
                     Initialization::bins[count][j] += private_bins[j];
+                    Initialization::corr[count][j] += private_corr[j];
                 }
                 for (int j = DATA; j < NBIN; ++j)
                 {
@@ -171,20 +181,23 @@ int main(void)
     {
         for (int j = 0; j < DATA; j++)
         {
-            Initialization::m[i][j] /= (1.0 * Parameters::BRONKEN_SIZE); // a /=b 的意思是 a = a / b，运算“/”在C++中默认向下取整，若想设为向上取整可设为 a = ceil(a / b)，b亦可指一个表达式
-            Initialization::bins[i][j] /= (1.0 * Parameters::BRONKEN_SIZE * Parameters::SAMPLE_SIZE);
+            Initialization::m[i][j] /= 1.0 * Parameters::BROKEN_SIZE; // a /=b 的意思是 a = a / b，运算“/”在C++中默认向下取整，若想设为向上取整可设为 a = ceil(a / b)，b亦可指一个表达式
+            Initialization::corr[i][j] /= 1.0 * Parameters::BROKEN_SIZE;
+            Initialization::bins[i][j] /= 1.0 * Parameters::BROKEN_SIZE;
         }
         FileUtils::w_output(output, Constants::temperature[i], Initialization::m[i]);
         for (int j = DATA; j < NBIN; j++)
         {
-            Initialization::bins[i][j] /= (1.0 * Parameters::BRONKEN_SIZE * Parameters::SAMPLE_SIZE); // a /=b 的意思是 a = a / b，运算“/”在C++中默认向下取整，若想设为向上取整可设为 a = ceil(a / b)，b亦可指一个表达式
+            Initialization::bins[i][j] /= 1.0 * Parameters::BROKEN_SIZE; // a /=b 的意思是 a = a / b，运算“/”在C++中默认向下取整，若想设为向上取整可设为 a = ceil(a / b)，b亦可指一个表达式
         }
-        FileUtils::w_error(outputBining, Constants::temperature[i], Initialization::bins[i], Initialization::m[i]);
+        FileUtils::w_error(outputBining, Constants::temperature[i], Initialization::m[i], Initialization::bins[i]);
+        FileUtils::w_corr(outputcorrelation, Constants::temperature[i], Initialization::corr[i]);
     }
 
     output.close();
     outputspins.close();
     outputBining.close();
+    outputcorrelation.close();
 
     // 获取结束时间
     auto end = std::chrono::high_resolution_clock::now();

@@ -2,7 +2,7 @@
 
 namespace Initialization
 {
-    double m[TN][DATA], bins[TN][NBIN];
+    double m[TN][DATA], bins[TN][NBIN], corr[TN][DATA];
     int up[Parameters::Q];
 
     // 初始化所有变量
@@ -22,21 +22,20 @@ namespace Initialization
     }
 
     // 初始化物理量的矩阵
-    void initialize_matrices(double *private_m, double *private_bins)
+    void initialize_matrices(double *private_m, double *private_bins, double *private_corr)
     {
         std::fill(private_m, private_m + DATA, 0.0);
         std::fill(private_bins, private_bins + NBIN, 0.0);
+        std::fill(private_corr, private_corr + DATA, 0.0); // 将每行的元素设置为0
     }
 
     void initialize_all_matrices()
     {
         for (int i = 0; i < TN; ++i)
         {
-            std::fill(m[i], m[i] + DATA, 0.0); // 将每行的元素设置为0
-        }
-        for (int i = 0; i < TN; ++i)
-        {
+            std::fill(m[i], m[i] + DATA, 0.0);       // 将每行的元素设置为0
             std::fill(bins[i], bins[i] + NBIN, 0.0); // 将每行的元素设置为0
+            std::fill(corr[i], corr[i] + DATA, 0.0); // 将每行的元素设置为0
         }
     }
 
@@ -47,7 +46,7 @@ namespace Initialization
         {
             spins[i] = brandom(gen);
         }
-        spins[SIZE] = Parameters::Q;
+        spins[SIZE] = -1;
     }
 }
 
@@ -66,6 +65,7 @@ namespace Initialization
 //         for (int j = 0; j < DATA; j++)
 //         {
 //             std::cout << Initialization::m[i][j];
+//             std::cout << Initialization::corr[i][j];
 //         }
 //         std::cout << std::endl;
 //     }

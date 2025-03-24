@@ -34,17 +34,17 @@ enum class Quantity
     MAG4,
 
     // 拿来计算bins中的涨落平均值
-    MAG_PLANE2_bin,
-    MAG2_bin,
-    ENE2_bin,
-    ORDER2_bin,
-    DIS2_bin,
-    AREA2_bin,
-    EULER2_bin,
-    SINGLE_VALUE2_bin,
-    NUCLEAR_NORM2_bin,
-    SHANNON2_bin,
-    MAG4_bin,
+    MAG_PLANE2_bin_sus,
+    MAG2_bin_sus,
+    ENE2_bin_sus,
+    ORDER2_bin_sus,
+    DIS2_bin_sus,
+    AREA2_bin_sus,
+    EULER2_bin_sus,
+    SINGLE_VALUE2_bin_sus,
+    NUCLEAR_NORM2_bin_sus,
+    SHANNON2_bin_sus,
+    MAG4_bin_sus,
 
     // 拿来计算误差
     MAG_PLANERR,
@@ -72,13 +72,13 @@ enum class Quantity
 
 namespace Initialization
 {
-    extern double m[TN][DATA], bins[TN][NBIN];
+    extern double m[TN][DATA], bins[TN][NBIN], corr[TN][DATA];
     extern int up[Parameters::Q];
 
     // 函数声明
     void initialize();
     void initialize_spin_up();
-    void initialize_matrices(double *private_m, double *private_bins);
+    void initialize_matrices(double *private_m, double *private_bins, double *private_corr);
     void initialize_all_matrices();
     void initialize_spins(int spins[SIZE + 1], std::mt19937 &gen, std::uniform_int_distribution<int> &brandom);
 }

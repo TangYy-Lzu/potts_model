@@ -54,75 +54,93 @@ namespace FileUtils
         file << binder << std::endl;
     }
 
-    void w_error(std::ofstream &file, double tstar, double *bins, double *m)
+    void w_error(std::ofstream &outputBining, double tstar, double *m, double *bins)
     {
-        int nbin = Parameters::BRONKEN_SIZE * Parameters::SAMPLE_SIZE;
-        file << tstar << " " << 1.0 / tstar << " ";
+        int nbin = Parameters::BROKEN_SIZE * Parameters::SAMPLE_SIZE;
+        outputBining << tstar << " " << 1.0 / tstar << " ";
 
         // 方差，bins只有rr的数据可以用
         double mag_plane_error = (bins[static_cast<int>(Quantity::MAG_PLANERR)] - m[static_cast<int>(Quantity::MAG_PLANE)] * m[static_cast<int>(Quantity::MAG_PLANE)]) / (nbin - 1);
-        double mag_plane_chi_error = (bins[static_cast<int>(Quantity::MAG_PLANE2RR)] - bins[static_cast<int>(Quantity::MAG_PLANE2_bin)] * bins[static_cast<int>(Quantity::MAG_PLANE2_bin)]) / (nbin - 1);
+        double mag_plane_chi_error = (bins[static_cast<int>(Quantity::MAG_PLANE2RR)] - bins[static_cast<int>(Quantity::MAG_PLANE2_bin_sus)] * bins[static_cast<int>(Quantity::MAG_PLANE2_bin_sus)]) / (nbin - 1);
         // 标准误差
         // mag_plane_error = sqrt(mag_plane_error);
         // mag_plane_chi_error = sqrt(mag_plane_chi_error);
-        file << mag_plane_error << " " << mag_plane_chi_error << " ";
+        outputBining << mag_plane_error << " " << mag_plane_chi_error << " ";
 
         double mag_error = (bins[static_cast<int>(Quantity::MAGRR)] - m[static_cast<int>(Quantity::MAG)] * m[static_cast<int>(Quantity::MAG)]) / (nbin - 1);
-        double mag_chi_error = (bins[static_cast<int>(Quantity::MAG2RR)] - bins[static_cast<int>(Quantity::MAG2_bin)] * bins[static_cast<int>(Quantity::MAG2_bin)]) / (nbin - 1);
+        double mag_chi_error = (bins[static_cast<int>(Quantity::MAG2RR)] - bins[static_cast<int>(Quantity::MAG2_bin_sus)] * bins[static_cast<int>(Quantity::MAG2_bin_sus)]) / (nbin - 1);
         // mag_error = sqrt(mag_error);
         // mag_chi_error = sqrt(mag_chi_error);
-        file << mag_error << " " << mag_chi_error << " ";
+        outputBining << mag_error << " " << mag_chi_error << " ";
 
-        double energy_erro = (bins[static_cast<int>(Quantity::ENERR)] - m[static_cast<int>(Quantity::ENE)] * m[static_cast<int>(Quantity::ENE)]) / (nbin - 1);
-        double heat_erro = (bins[static_cast<int>(Quantity::ENE2RR)] - bins[static_cast<int>(Quantity::ENE2_bin)] * bins[static_cast<int>(Quantity::ENE2_bin)]) / (nbin - 1);
-        // energy_erro = sqrt(energy_erro);
-        // heat_erro = sqrt(heat_erro);
-        file << energy_erro << " " << heat_erro << " ";
+        double energy_error = (bins[static_cast<int>(Quantity::ENERR)] - m[static_cast<int>(Quantity::ENE)] * m[static_cast<int>(Quantity::ENE)]) / (nbin - 1);
+        double heat_error = (bins[static_cast<int>(Quantity::ENE2RR)] - bins[static_cast<int>(Quantity::ENE2_bin_sus)] * bins[static_cast<int>(Quantity::ENE2_bin_sus)]) / (nbin - 1);
+        // energy_error = sqrt(energy_error);
+        // heat_error = sqrt(heat_error);
+        outputBining << energy_error << " " << heat_error << " ";
 
-        double order_erro = (bins[static_cast<int>(Quantity::ORDERRR)] - m[static_cast<int>(Quantity::ORDER)] * m[static_cast<int>(Quantity::ORDER)]) / (nbin - 1);
-        double order_chi_erro = (bins[static_cast<int>(Quantity::ORDER2RR)] - bins[static_cast<int>(Quantity::ORDER2_bin)] * bins[static_cast<int>(Quantity::ORDER2_bin)]) / (nbin - 1);
-        // order_erro = sqrt(order_erro);
-        // order_chi_erro = sqrt(order_chi_erro);
-        file << order_erro << " " << order_chi_erro << " ";
+        double order_error = (bins[static_cast<int>(Quantity::ORDERRR)] - m[static_cast<int>(Quantity::ORDER)] * m[static_cast<int>(Quantity::ORDER)]) / (nbin - 1);
+        double order_chi_error = (bins[static_cast<int>(Quantity::ORDER2RR)] - bins[static_cast<int>(Quantity::ORDER2_bin_sus)] * bins[static_cast<int>(Quantity::ORDER2_bin_sus)]) / (nbin - 1);
+        // order_error = sqrt(order_error);
+        // order_chi_error = sqrt(order_chi_error);
+        outputBining << order_error << " " << order_chi_error << " ";
 
-        double dis_erro = (bins[static_cast<int>(Quantity::DISRR)] - m[static_cast<int>(Quantity::DIS)] * m[static_cast<int>(Quantity::DIS)]) / (nbin - 1);
-        double dis_chi_erro = (bins[static_cast<int>(Quantity::DIS2RR)] - bins[static_cast<int>(Quantity::DIS2_bin)] * bins[static_cast<int>(Quantity::DIS2_bin)]) / (nbin - 1);
-        // dis_erro = sqrt(dis_erro);
-        // dis_chi_erro = sqrt(dis_chi_erro);
-        file << dis_erro << " " << dis_chi_erro << " ";
+        double dis_error = (bins[static_cast<int>(Quantity::DISRR)] - m[static_cast<int>(Quantity::DIS)] * m[static_cast<int>(Quantity::DIS)]) / (nbin - 1);
+        double dis_chi_error = (bins[static_cast<int>(Quantity::DIS2RR)] - bins[static_cast<int>(Quantity::DIS2_bin_sus)] * bins[static_cast<int>(Quantity::DIS2_bin_sus)]) / (nbin - 1);
+        // dis_error = sqrt(dis_error);
+        // dis_chi_error = sqrt(dis_chi_error);
+        outputBining << dis_error << " " << dis_chi_error << " ";
 
-        double area_erro = (bins[static_cast<int>(Quantity::AREARR)] - m[static_cast<int>(Quantity::AREA)] * m[static_cast<int>(Quantity::AREA)]) / (nbin - 1);
-        double area_chi_erro = (bins[static_cast<int>(Quantity::AREA2RR)] - bins[static_cast<int>(Quantity::AREA2_bin)] * bins[static_cast<int>(Quantity::AREA2_bin)]) / (nbin - 1);
-        // area_erro = sqrt(area_erro);
-        // area_chi_erro = sqrt(area_chi_erro);
-        file << area_erro << " " << area_chi_erro << " ";
+        double area_error = (bins[static_cast<int>(Quantity::AREARR)] - m[static_cast<int>(Quantity::AREA)] * m[static_cast<int>(Quantity::AREA)]) / (nbin - 1);
+        double area_chi_error = (bins[static_cast<int>(Quantity::AREA2RR)] - bins[static_cast<int>(Quantity::AREA2_bin_sus)] * bins[static_cast<int>(Quantity::AREA2_bin_sus)]) / (nbin - 1);
+        // area_error = sqrt(area_error);
+        // area_chi_error = sqrt(area_chi_error);
+        outputBining << area_error << " " << area_chi_error << " ";
 
-        double euler_erro = (bins[static_cast<int>(Quantity::EULERRR)] - m[static_cast<int>(Quantity::EULER)] * m[static_cast<int>(Quantity::EULER)]) / (nbin - 1);
-        double euler_chi_erro = (bins[static_cast<int>(Quantity::EULER2RR)] - bins[static_cast<int>(Quantity::EULER2_bin)] * bins[static_cast<int>(Quantity::EULER2_bin)]) / (nbin - 1);
-        // euler_erro = sqrt(euler_erro);
-        // euler_chi_erro = sqrt(euler_chi_erro);
-        file << euler_erro << " " << euler_chi_erro << " ";
+        double euler_error = (bins[static_cast<int>(Quantity::EULERRR)] - m[static_cast<int>(Quantity::EULER)] * m[static_cast<int>(Quantity::EULER)]) / (nbin - 1);
+        double euler_chi_error = (bins[static_cast<int>(Quantity::EULER2RR)] - bins[static_cast<int>(Quantity::EULER2_bin_sus)] * bins[static_cast<int>(Quantity::EULER2_bin_sus)]) / (nbin - 1);
+        // euler_error = sqrt(euler_error);
+        // euler_chi_error = sqrt(euler_chi_error);
+        outputBining << euler_error << " " << euler_chi_error << " ";
 
-        double single_value_erro = (bins[static_cast<int>(Quantity::SINGLE_VALUERR)] - m[static_cast<int>(Quantity::SINGLE_VALUE)] * m[static_cast<int>(Quantity::SINGLE_VALUE)]) / (nbin - 1);
-        double single_value_chi_erro = (bins[static_cast<int>(Quantity::SINGLE_VALUE2RR)] - bins[static_cast<int>(Quantity::SINGLE_VALUE2_bin)] * bins[static_cast<int>(Quantity::SINGLE_VALUE2_bin)]) / (nbin - 1);
-        // single_value_erro = sqrt(single_value_erro);
-        // single_value_chi_erro = sqrt(single_value_chi_erro);
-        file << single_value_erro << " " << single_value_chi_erro << " ";
+        double single_value_error = (bins[static_cast<int>(Quantity::SINGLE_VALUERR)] - m[static_cast<int>(Quantity::SINGLE_VALUE)] * m[static_cast<int>(Quantity::SINGLE_VALUE)]) / (nbin - 1);
+        double single_value_chi_error = (bins[static_cast<int>(Quantity::SINGLE_VALUE2RR)] - bins[static_cast<int>(Quantity::SINGLE_VALUE2_bin_sus)] * bins[static_cast<int>(Quantity::SINGLE_VALUE2_bin_sus)]) / (nbin - 1);
+        // single_value_erro = sqrt(single_value_error);
+        // single_value_chi_erro = sqrt(single_value_chi_error);
+        outputBining << single_value_error << " " << single_value_chi_error << " ";
 
-        double nuclear_norm_erro = (bins[static_cast<int>(Quantity::NUCLEAR_NORMRR)] - m[static_cast<int>(Quantity::NUCLEAR_NORM)] * m[static_cast<int>(Quantity::NUCLEAR_NORM)]) / (nbin - 1);
-        double nuclear_norm_chi_erro = (bins[static_cast<int>(Quantity::NUCLEAR_NORM2RR)] - bins[static_cast<int>(Quantity::NUCLEAR_NORM2_bin)] * bins[static_cast<int>(Quantity::NUCLEAR_NORM2_bin)]) / (nbin - 1);
-        // nuclear_norm_erro = sqrt(nuclear_norm_erro);
-        // nuclear_norm_chi_erro = sqrt(nuclear_norm_chi_erro);
-        file << nuclear_norm_erro << " " << nuclear_norm_chi_erro << " ";
+        double nuclear_norm_error = (bins[static_cast<int>(Quantity::NUCLEAR_NORMRR)] - m[static_cast<int>(Quantity::NUCLEAR_NORM)] * m[static_cast<int>(Quantity::NUCLEAR_NORM)]) / (nbin - 1);
+        double nuclear_norm_chi_error = (bins[static_cast<int>(Quantity::NUCLEAR_NORM2RR)] - bins[static_cast<int>(Quantity::NUCLEAR_NORM2_bin_sus)] * bins[static_cast<int>(Quantity::NUCLEAR_NORM2_bin_sus)]) / (nbin - 1);
+        // nuclear_norm_error = sqrt(nuclear_norm_error);
+        // nuclear_norm_chi_error = sqrt(nuclear_norm_chi_error);
+        outputBining << nuclear_norm_error << " " << nuclear_norm_chi_error << " ";
 
-        double shannon_erro = (bins[static_cast<int>(Quantity::SHANNONRR)] - m[static_cast<int>(Quantity::SHANNON)] * m[static_cast<int>(Quantity::SHANNON)]) / (nbin - 1);
-        double shannon_chi_erro = (bins[static_cast<int>(Quantity::SHANNON2RR)] - bins[static_cast<int>(Quantity::SHANNON2_bin)] * bins[static_cast<int>(Quantity::SHANNON2_bin)]) / (nbin - 1);
-        // shannon_erro = sqrt(shannon_erro);
-        // shannon_chi_erro = sqrt(shannon_chi_erro);
-        file << shannon_erro << " " << shannon_chi_erro << " ";
+        double shannon_error = (bins[static_cast<int>(Quantity::SHANNONRR)] - m[static_cast<int>(Quantity::SHANNON)] * m[static_cast<int>(Quantity::SHANNON)]) / (nbin - 1);
+        double shannon_chi_error = (bins[static_cast<int>(Quantity::SHANNON2RR)] - bins[static_cast<int>(Quantity::SHANNON2_bin_sus)] * bins[static_cast<int>(Quantity::SHANNON2_bin_sus)]) / (nbin - 1);
+        // shannon_error = sqrt(shannon_error);
+        // shannon_chi_error = sqrt(shannon_chi_error);
+        outputBining << shannon_error << " " << shannon_chi_error << " ";
 
-        double binder_erro = (bins[static_cast<int>(Quantity::MAG4RR)] - m[static_cast<int>(Quantity::MAG4)] * m[static_cast<int>(Quantity::MAG4)]) / (nbin - 1);
-        binder_erro = sqrt(binder_erro);
-        file << binder_erro << std::endl;
+        double binder_error = (bins[static_cast<int>(Quantity::MAG4RR)] - m[static_cast<int>(Quantity::MAG4)] * m[static_cast<int>(Quantity::MAG4)]) / (nbin - 1);
+        // binder_error = sqrt(binder_erro);
+        outputBining << binder_error << std::endl;
+    }
+
+    void w_corr(std::ofstream &outputcorrelation, double tstar, double *corr)
+    {
+        outputcorrelation << tstar << " " << 1.0 / tstar << " ";
+
+        // 关联
+        outputcorrelation << corr[static_cast<int>(Quantity::MAG_PLANE)] << " " << corr[static_cast<int>(Quantity::MAG_PLANE2)] << " ";
+        outputcorrelation << corr[static_cast<int>(Quantity::MAG)] << " " << corr[static_cast<int>(Quantity::MAG2)] << " ";
+        outputcorrelation << corr[static_cast<int>(Quantity::ENE)] << " " << corr[static_cast<int>(Quantity::ENE2)] << " ";
+        outputcorrelation << corr[static_cast<int>(Quantity::ORDER)] << " " << corr[static_cast<int>(Quantity::ORDER2)] << " ";
+        outputcorrelation << corr[static_cast<int>(Quantity::DIS)] << " " << corr[static_cast<int>(Quantity::DIS2)] << " ";
+        outputcorrelation << corr[static_cast<int>(Quantity::AREA)] << " " << corr[static_cast<int>(Quantity::AREA2)] << " ";
+        outputcorrelation << corr[static_cast<int>(Quantity::EULER)] << " " << corr[static_cast<int>(Quantity::EULER2)] << " ";
+        outputcorrelation << corr[static_cast<int>(Quantity::SINGLE_VALUE)] << " " << corr[static_cast<int>(Quantity::SINGLE_VALUE2)] << " ";
+        outputcorrelation << corr[static_cast<int>(Quantity::NUCLEAR_NORM)] << " " << corr[static_cast<int>(Quantity::NUCLEAR_NORM2)] << " ";
+        outputcorrelation << corr[static_cast<int>(Quantity::SHANNON)] << " " << corr[static_cast<int>(Quantity::SHANNON2)] << " ";
+        outputcorrelation << corr[static_cast<int>(Quantity::MAG4)] << std::endl;
     }
 }
