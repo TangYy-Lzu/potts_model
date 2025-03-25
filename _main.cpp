@@ -55,24 +55,24 @@ int main(void)
 
 #pragma omp parallel num_threads(8)
     {
+        std::uniform_int_distribution<int> brandom(0, q);        // Get any random integer，获取任意0到q之间随机整数值，也让他决定自旋往哪个态调整
+        std::uniform_int_distribution<int> ran_pos(0, SIZE - 1); // Get any random integer，获取任意0到SIZE-1随机整数值
+        std::uniform_real_distribution<double> ran_u(0.0, 1.0);  // Our uniform variable generator，产生均匀分布
+
         thread_local std::mt19937 gen(958431198 + omp_get_thread_num()); // 线程独立的随机数生成器
 
         int spins[SIZE + 1]; // 储存自旋信息
+
+        double tstar, energy; // Control parameter，控制参数
 
         double private_m[DATA], private_bins[NBIN], private_corr[DATA]; // 暂时储存物理量
 
 #pragma omp for
         for (int i = 0; i < Parameters::BROKEN_SIZE; ++i)
         {
-            std::uniform_int_distribution<int> brandom(0, q);        // Get any random integer，获取任意0到q之间随机整数值，也让他决定自旋往哪个态调整
-            std::uniform_int_distribution<int> ran_pos(0, SIZE - 1); // Get any random integer，获取任意0到SIZE-1随机整数值
-            std::uniform_real_distribution<double> ran_u(0.0, 1.0);  // Our uniform variable generator，产生均匀分布
-
-            double energy;
             Initialization::initialize_spins(spins, gen, brandom); // Init randomly，初始化
             energy = quantity::get_energy(spins);                  // Compute initial energy，计算初始内能
 
-            double tstar; // Control parameter，控制参数
             int count = 0;
 
             for (tstar = Parameters::T_MAX; tstar > Constants::tcrit_upCompare; tstar -= Parameters::DELTA_T)
