@@ -297,6 +297,8 @@ namespace mc_step
                 private_bins[j] /= (1.0 * Parameters::GROUP_SIZE);
             }
 
+            update_bins(private_m, private_bins, private_corr, old);
+
             if (i == Parameters::SAMPLE_SIZE - 2)
             {
                 for (int j = 0; j < DATA; j++)
@@ -506,6 +508,8 @@ namespace mc_step
             {
                 private_bins[j] /= (1.0 * Parameters::GROUP_SIZE);
             }
+
+            update_bins(private_m, private_bins, private_corr, old);
 
             if (i == Parameters::SAMPLE_SIZE - 2)
             {

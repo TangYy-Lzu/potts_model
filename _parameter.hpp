@@ -8,10 +8,10 @@ namespace Parameters
     constexpr double J = 1;
 
     // Quantum number
-    constexpr int Q = 3;
+    constexpr int Q = 2;
 
     // Type of lattice
-    constexpr const char *LATTICE_TYPE = "diced";
+    constexpr const char *LATTICE_TYPE = "square";
 
     // Size of lattice
     constexpr int LATTICE_SIZE = 6; // Should be a multiple of 3 for diced lattice and 2 for union jack lattice
@@ -21,8 +21,8 @@ namespace Parameters
     constexpr double T_MIN = 0.0;
 
     // Critical temperatures
-    constexpr double T_CRIT_UP = 0.8;
-    constexpr double T_CRIT_DOWN = 0.3;
+    constexpr double T_CRIT_UP = 1.5;
+    constexpr double T_CRIT_DOWN = 1.0;
 
     // Number of samples and groups
     constexpr int BROKEN_SIZE = 8;

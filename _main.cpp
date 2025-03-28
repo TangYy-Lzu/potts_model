@@ -55,17 +55,15 @@ int main(void)
 
 #pragma omp parallel num_threads(8)
     {
-        std::uniform_int_distribution<int> brandom(0, q);        // Get any random integer，获取任意0到q之间随机整数值，也让他决定自旋往哪个态调整
-        std::uniform_int_distribution<int> ran_pos(0, SIZE - 1); // Get any random integer，获取任意0到SIZE-1随机整数值
-        std::uniform_real_distribution<double> ran_u(0.0, 1.0);  // Our uniform variable generator，产生均匀分布
-
-        thread_local std::mt19937 gen(958431198 + omp_get_thread_num()); // 线程独立的随机数生成器
-
         int spins[SIZE + 1]; // 储存自旋信息
 
-        double tstar, energy; // Control parameter，控制参数
-
+        double tstar, energy;                                           // Control parameter，控制参数
         double private_m[DATA], private_bins[NBIN], private_corr[DATA]; // 暂时储存物理量
+
+        thread_local std::mt19937 gen(958431198 + omp_get_thread_num()); // 线程独立的随机数生成器
+        std::uniform_int_distribution<int> brandom(0, q);                // Get any random integer，获取任意0到q之间随机整数值，也让他决定自旋往哪个态调整
+        std::uniform_int_distribution<int> ran_pos(0, SIZE - 1);         // Get any random integer，获取任意0到SIZE-1随机整数值
+        std::uniform_real_distribution<double> ran_u(0.0, 1.0);          // Our uniform variable generator，产生均匀分布
 
 #pragma omp for
         for (int i = 0; i < Parameters::BROKEN_SIZE; ++i)
@@ -107,7 +105,7 @@ int main(void)
             {
                 if (Parameters::J < 0)
                 {
-                    mc_step::do_step_wolff(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins, private_corr);
+                    mc_step::do_step(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins, private_corr);
                 }
                 else if (Parameters::J > 0)
                 {
