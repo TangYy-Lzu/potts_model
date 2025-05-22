@@ -11,4 +11,4 @@ namespace matrix
     void Single_Value(const int spins[SIZE + 1], double sv[3]); // 计算奇异值之和
 }
 
-#endif // QUANTITY_H
+#endif // matrix_hpp

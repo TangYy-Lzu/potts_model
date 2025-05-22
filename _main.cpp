@@ -105,11 +105,11 @@ int main(void)
             {
                 if (Parameters::J < 0)
                 {
-                    mc_step::do_step(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins, private_corr);
+                    mc_step::do_step_wolff(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins, private_corr);
                 }
                 else if (Parameters::J > 0)
                 {
-                    mc_step::do_step(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins, private_corr);
+                    mc_step::do_step_wolff_afm(spins, tstar, energy, gen, brandom, ran_pos, ran_u, private_m, private_bins, private_corr);
                 }
 #pragma omp critical
                 {

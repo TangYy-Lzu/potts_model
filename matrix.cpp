@@ -10,7 +10,8 @@ namespace matrix
         // 填充矩阵
         for (int i = 0; i < Parameters::LATTICE_SIZE; ++i)
         {
-            for (int j = 0; j < Parameters::LATTICE_SIZE; ++j)
+            mat(i, i) = Parameters::LATTICE_SIZE;
+            for (int j = i + 1; j < Parameters::LATTICE_SIZE; ++j)
             {
                 mat(i, j) = 0;
                 for (int k = 0; k < Parameters::LATTICE_SIZE; ++k)
@@ -18,10 +19,12 @@ namespace matrix
                     if (spins[i * Parameters::LATTICE_SIZE + k] == spins[j * Parameters::LATTICE_SIZE + k])
                     {
                         mat(i, j) += 1;
+                        mat(j, i) += 1;
                     }
                     else
                     {
                         mat(i, j) -= (1.0 / (1.0 * (Parameters::Q - 1)));
+                        mat(j, i) -= (1.0 / (1.0 * (Parameters::Q - 1)));
                     }
                 }
             }

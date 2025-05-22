@@ -2,7 +2,6 @@
 
 namespace FileUtils
 {
-    int dimentions = SIZE + 1;
     void write(std::ofstream &output, double tstar, int spins[SIZE + 1])
     {
         output << tstar << " ";

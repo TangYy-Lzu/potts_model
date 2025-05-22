@@ -222,7 +222,10 @@ namespace mc_step
 
             for (j = 0; j < Parameters::GROUP_SIZE; j++)
             {
-                area(spins, energy, gen, tstar, brandom, ran_pos, ran_u, pa);
+                for (k = 0; k < 10; k++)
+                {
+                    area(spins, energy, gen, tstar, brandom, ran_pos, ran_u, pa);
+                }
 
                 double sum[4] = {0}; // 空间距离
                 double sv[3] = {0};  // 范数
