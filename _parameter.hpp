@@ -26,8 +26,8 @@ namespace Parameters
 
     // Number of samples and groups
     constexpr int BROKEN_SIZE = 8;
-    constexpr int SAMPLE_SIZE = 100;
-    constexpr int GROUP_SIZE = 100;
+    constexpr int SAMPLE_SIZE = 10;
+    constexpr int GROUP_SIZE = 1000;
 
     // Time steps
     constexpr double DELTA_T = 0.1;

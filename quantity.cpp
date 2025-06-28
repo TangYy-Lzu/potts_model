@@ -28,22 +28,49 @@ namespace quantity
         std::array<double, Parameters::Q> dist_total = {0.0};
 
         // 计算序参量
-        for (int i = 0; i < Parameters::LATTICE_SIZE; ++i)
+        if (Parameters::Q == 2)
         {
-            for (int j = 0; j < Parameters::LATTICE_SIZE; ++j)
+            int sum_Q = 0, sum_Q_A = 0, sum_Q_B = 0;
+            // 计算序参量
+            for (int i = 0; i < Parameters::LATTICE_SIZE; ++i)
             {
-                int spin_val = spins[i + j * Parameters::LATTICE_SIZE];
-                dist_total[spin_val]++;
+                for (int j = 0; j < Parameters::LATTICE_SIZE; ++j)
+                {
+                    int spin_val = spins[i + j * Parameters::LATTICE_SIZE];
+                    dist_total[spin_val]++;
+
+                    if ((i + j) % 2 == 0)
+                    {
+                        sum_Q_A += spin_val;
+                    }
+                    else
+                    {
+                        sum_Q_B += spin_val;
+                    }
+                }
+            }
+            sum_Q = sum_Q_A + SIZE / 2 - sum_Q_B;    // 计算总的序参量
+            sum[0] = abs((2 * sum_Q - SIZE) / SIZE); // 将最大元素赋值给 sum[0]
+        }
+        else
+        {
+            for (int i = 0; i < Parameters::LATTICE_SIZE; ++i)
+            {
+                for (int j = 0; j < Parameters::LATTICE_SIZE; ++j)
+                {
+                    int spin_val = spins[i + j * Parameters::LATTICE_SIZE];
+                    dist_total[spin_val]++;
+                }
+            }
+
+            auto max_it = std::max_element(dist_total.begin(), dist_total.end()); // 序参量
+
+            // 将最大元素赋值给 sum[3]，这个判断的目的是为了确保 max_it 有效，避免访问无效的迭代器或空容器的情况。
+            if (max_it != dist_total.end())
+            {
+                sum[0] = *max_it / SIZE; // 将最大元素赋值给 sum[3]
             }
         }
-        auto max_it = std::max_element(dist_total.begin(), dist_total.end()); // 序参量
-
-        // 将最大元素赋值给 sum[3]，这个判断的目的是为了确保 max_it 有效，避免访问无效的迭代器或空容器的情况。
-        if (max_it != dist_total.end())
-        {
-            sum[0] = *max_it / SIZE; // 将最大元素赋值给 sum[3]
-        }
-
         // 计算离原点距离
         for (int i = 0; i < Parameters::Q; ++i)
         {
@@ -90,13 +117,28 @@ namespace quantity
                 }
             }
         }
-        auto max_it = std::max_element(sum_Q.begin(), sum_Q.end()); // 序参量
+        // 找最大值的迭代器
+        auto max_it = std::max_element(sum_Q.begin(), sum_Q.end());
+        double max_val = *max_it;
 
-        // 将最大元素赋值给 sum[3]，这个判断的目的是为了确保 max_it 有效，避免访问无效的迭代器或空容器的情况。
-        if (max_it != sum_Q.end())
+        // 计算其他两个值之和
+        double sum_others = 0.0;
+        for (auto it = sum_Q.begin(); it != sum_Q.end(); ++it)
         {
-            sum[0] = *max_it * 3.0 / SIZE; // 将最大元素赋值给 sum[3]
+            if (it != max_it)
+            {
+                sum_others += *it;
+            }
         }
+
+        // 计算结果
+        sum[0] = (max_val - 0.5 * sum_others) * 3 / SIZE;
+
+        // // 将最大元素赋值给 sum[3]，这个判断的目的是为了确保 max_it 有效，避免访问无效的迭代器或空容器的情况。
+        // if (max_it != sum_Q.end())
+        // {
+        //     // sum[0] = *max_it * 3.0 / SIZE; // 将最大元素赋值给 sum[3]
+        // }
 
         // 计算磁化强度，这是在一个平面内的
         double mag;
@@ -147,35 +189,63 @@ namespace quantity
     void distance_union_jack(const int spins[SIZE + 1], double sum[4])
     {
         std::array<double, Parameters::Q> dist_total = {0.0};
-        std::array<int, Parameters::Q> sum_Q_A = {0};
-        std::array<int, Parameters::Q> sum_Q_B = {0};
 
         // 计算序参量
-        for (int i = 0; i < Parameters::LATTICE_SIZE; ++i)
+        if (Parameters::Q == 2)
         {
-            for (int j = 0; j < Parameters::LATTICE_SIZE; ++j)
+            int sum_Q = 0, sum_Q_A = 0, sum_Q_B = 0;
+            // 计算序参量
+            for (int i = 0; i < Parameters::LATTICE_SIZE; ++i)
             {
-                int spin_val = spins[i + j * Parameters::LATTICE_SIZE];
-                dist_total[spin_val]++;
+                for (int j = 0; j < Parameters::LATTICE_SIZE; ++j)
+                {
+                    int spin_val = spins[i + j * Parameters::LATTICE_SIZE];
+                    dist_total[spin_val]++;
 
-                if (((i % 2) != 0) && ((j % 2) == 0))
-                {
-                    sum_Q_A[spin_val]++;
-                }
-                else if (((i % 2) == 0) && ((j % 2) != 0))
-                {
-                    sum_Q_B[spin_val]++;
+                    if (((i % 2) != 0) && ((j % 2) == 0))
+                    {
+                        sum_Q_A += spin_val;
+                    }
+                    else if (((i % 2) == 0) && ((j % 2) != 0))
+                    {
+                        sum_Q_B += spin_val;
+                    }
                 }
             }
+            sum_Q = sum_Q_A + SIZE / 4 - sum_Q_B;                // 计算总的序参量
+            sum[0] = abs((2 * sum_Q - (SIZE / 2)) / (SIZE / 2)); // 将最大元素赋值给 sum[3]
         }
-        auto max_it_A = std::max_element(sum_Q_A.begin(), sum_Q_A.end()); // 序参量
-        auto max_it_B = std::max_element(sum_Q_B.begin(), sum_Q_B.end()); // 序参量
-        auto max_it = std::max(max_it_A, max_it_B);
-
-        // 将最大元素赋值给 sum[3]，这个判断的目的是为了确保 max_it 有效，避免访问无效的迭代器或空容器的情况。
-        if (max_it != sum_Q_A.end())
+        else
         {
-            sum[0] = *max_it * 4.0 / SIZE; // 将最大元素赋值给 sum[3]
+            std::array<int, Parameters::Q> sum_Q_A = {0};
+            std::array<int, Parameters::Q> sum_Q_B = {0};
+            // 计算序参量
+            for (int i = 0; i < Parameters::LATTICE_SIZE; ++i)
+            {
+                for (int j = 0; j < Parameters::LATTICE_SIZE; ++j)
+                {
+                    int spin_val = spins[i + j * Parameters::LATTICE_SIZE];
+                    dist_total[spin_val]++;
+
+                    if (((i % 2) != 0) && ((j % 2) == 0))
+                    {
+                        sum_Q_A[spin_val]++;
+                    }
+                    else if (((i % 2) == 0) && ((j % 2) != 0))
+                    {
+                        sum_Q_B[spin_val]++;
+                    }
+                }
+            }
+            auto max_it_A = std::max_element(sum_Q_A.begin(), sum_Q_A.end()); // 序参量
+            auto max_it_B = std::max_element(sum_Q_B.begin(), sum_Q_B.end()); // 序参量
+            auto max_it = std::max(max_it_A, max_it_B);
+
+            // 将最大元素赋值给 sum[3]，这个判断的目的是为了确保 max_it 有效，避免访问无效的迭代器或空容器的情况。
+            if (max_it != sum_Q_A.end())
+            {
+                sum[0] = *max_it * 4.0 / SIZE; // 将最大元素赋值给 sum[3]
+            }
         }
 
         // 计算磁化强度，这是在一个平面内的
